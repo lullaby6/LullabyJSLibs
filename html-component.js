@@ -1,31 +1,19 @@
-const htmlComponentRender = container => {
-    const htmlComponents = container.querySelectorAll('html-component');
+(function htmlComponentRender(container) {
+    container.querySelectorAll('html-component').forEach(async htmlComponent => {
+        if(htmlComponent.hasAttribute('rendered')) return
 
-    htmlComponents.forEach(async htmlComponent => {
-        if(!htmlComponent.hasAttribute('rendered')){
-            const res = await fetch(htmlComponent.getAttribute('path'));
-            let text = await res.text();
+        const res = await fetch(htmlComponent.getAttribute('src'));
+        let text = await res.text();
 
-            const tempDivElement = document.createElement('div');
-            tempDivElement.innerHTML = text;
+        htmlComponent.setAttribute('children', htmlComponent.innerHTML);
 
-            const slotsElements = tempDivElement.querySelectorAll('slot')
-            slotsElements.forEach(slotsElement => {
-                slotsElement.innerHTML = htmlComponent.innerHTML
-            })
+        const propsRegex = /\{(\w+)\}/g;
+        htmlComponent.innerHTML = text.replace(propsRegex, (match, att) => {
+            return htmlComponent.getAttribute(att) || '';
+        })
 
-            const propsElements = tempDivElement.querySelectorAll('prop')
-            propsElements.forEach(propElement => {
-                propElement.innerHTML = htmlComponent.getAttribute(propElement.innerText)
-            })
+        htmlComponent.setAttribute('rendered', '')
 
-            htmlComponent.innerHTML = tempDivElement.innerHTML;
-
-            htmlComponent.setAttribute('rendered', '')
-
-            htmlComponentRender(htmlComponent)
-        }
+        htmlComponentRender(htmlComponent)
     })
-}
-
-htmlComponentRender(document)
+})(document)
