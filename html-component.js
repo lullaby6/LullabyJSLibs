@@ -8,8 +8,15 @@
         htmlComponent.setAttribute('children', htmlComponent.innerHTML);
 
         const propsRegex = /\{(\w+)\}/g;
-        htmlComponent.innerHTML = text.replace(propsRegex, (match, att) => {
-            return htmlComponent.getAttribute(att) || '';
+        htmlComponent.innerHTML = text.replace(propsRegex, (match, att) =>
+             htmlComponent.getAttribute(att) || ''
+        )
+
+        htmlComponent.querySelectorAll('script').forEach(scriptElement => {
+            const newScriptElement = document.createElement('script');
+            newScriptElement.innerHTML = scriptElement.innerHTML
+            document.getElementsByTagName('head')[0].appendChild(newScriptElement)
+            scriptElement.remove()
         })
 
         htmlComponent.setAttribute('rendered', '')
