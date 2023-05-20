@@ -1,26 +1,40 @@
-(function htmlComponentRender(container) {
-    container.querySelectorAll('html-component').forEach(async htmlComponent => {
-        if(htmlComponent.hasAttribute('rendered')) return
+window.HTMLComponentRender = container => {
+    container.querySelectorAll('html-component').forEach(async HTMLComponent => {
+        if(HTMLComponent.hasAttribute('rendered')) return
 
-        const res = await fetch(htmlComponent.getAttribute('src'));
+        const res = await fetch(HTMLComponent.getAttribute('src'));
         let text = await res.text();
 
-        htmlComponent.setAttribute('children', htmlComponent.innerHTML);
+        HTMLComponent.setAttribute('children', HTMLComponent.innerHTML);
 
         const propsRegex = /\{(\w+)\}/g;
-        htmlComponent.innerHTML = text.replace(propsRegex, (match, att) =>
-             htmlComponent.getAttribute(att) || ''
+        HTMLComponent.innerHTML = text.replace(propsRegex, (match, att) =>
+        HTMLComponent.getAttribute(att) || ''
         )
 
-        htmlComponent.querySelectorAll('script').forEach(scriptElement => {
+        HTMLComponent.querySelectorAll('script').forEach(scriptElement => {
             const newScriptElement = document.createElement('script');
             newScriptElement.innerHTML = scriptElement.innerHTML
             document.getElementsByTagName('head')[0].appendChild(newScriptElement)
             scriptElement.remove()
         })
 
-        htmlComponent.setAttribute('rendered', '')
+        HTMLComponent.setAttribute('rendered', '')
 
-        htmlComponentRender(htmlComponent)
+        HTMLComponentRender(HTMLComponent)
     })
-})(document)
+
+    container.querySelectorAll('[listener]').forEach(async listenerElement =>
+        listenerElement.getAttribute('listener').split(' ').forEach(listener => {
+            const [eventName, methodName] = listener.split('-')
+            if(eventName == 'load') {
+                listenerMethods[methodName](listenerElement.dispatchEvent(new Event('load')))
+            }else{
+                listenerElement.addEventListener(eventName, event => listenerMethods[methodName](event))
+            }
+        })
+    )
+}
+
+window.listenerMethods = {}
+window.HTMLComponentRender(document)
