@@ -27,6 +27,6 @@ whatsappButtonElements.forEach(element => {
 	element.appendChild(image);
 
 	element.addEventListener('click', () => {
-		window.open(`https://wa.me/${number}`, '_blank');
+		if(number) window.open(`https://wa.me/${number}`, '_blank');
 	})
 })
