@@ -12,10 +12,19 @@ window.HTMLComponentRender = container => {
         HTMLComponent.getAttribute(att) || ''
         )
 
-        HTMLComponent.querySelectorAll('script').forEach(scriptElement => {
-            const newScriptElement = document.createElement('script');
-            newScriptElement.innerHTML = scriptElement.innerHTML
-            document.getElementsByTagName('head')[0].appendChild(newScriptElement)
+        HTMLComponent.querySelectorAll('script').forEach(async scriptElement => {
+            if (scriptElement.hasAttribute('src')) {
+                const res = await fetch(scriptElement.getAttribute('src'))
+                const data = await res.text()
+
+                const newScriptElement = document.createElement('script');
+                newScriptElement.innerHTML = data
+                document.getElementsByTagName('head')[0].appendChild(newScriptElement)
+            }else{
+                const newScriptElement = document.createElement('script');
+                newScriptElement.innerHTML = scriptElement.innerHTML
+                document.getElementsByTagName('head')[0].appendChild(newScriptElement)
+            }
             scriptElement.remove()
         })
 
