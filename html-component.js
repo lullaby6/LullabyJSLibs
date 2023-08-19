@@ -2,8 +2,6 @@ window.HTMLComponentRender = container => {
     container.querySelectorAll('html-component').forEach(async HTMLComponent => {
         if(HTMLComponent.hasAttribute('rendered')) return
 
-        HTMLComponent.attachShadow({mode: "open"});
-
         const res = await fetch(HTMLComponent.getAttribute('src'));
         let text = await res.text();
 
@@ -12,6 +10,8 @@ window.HTMLComponentRender = container => {
         const propsRegex = /\{(\w+)\}/g;
 
         if(HTMLComponent.hasAttribute('shadow-dom')) {
+            HTMLComponent.attachShadow({mode: "open"});
+
             HTMLComponent.shadowRoot.innerHTML = text.replace(propsRegex, (match, att) =>
             HTMLComponent.getAttribute(att) || ''
             )
