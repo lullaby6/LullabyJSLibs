@@ -18,11 +18,11 @@ window.HTMLComponentRender = container => {
 
             HTMLComponent.shadowRoot.querySelectorAll('script').forEach(async scriptElement => {
                 if (scriptElement.hasAttribute('src')) {
-                    const res = await fetch(scriptElement.getAttribute('src'))
-                    const data = await res.text()
+                    const scriptRes = await fetch(scriptElement.getAttribute('src'))
+                    const scriptText = await scriptRes.text()
 
                     const newScriptElement = document.createElement('script');
-                    newScriptElement.innerHTML = data
+                    newScriptElement.innerHTML = scriptText
                     document.getElementsByTagName('head')[0].appendChild(newScriptElement)
                 }else{
                     const newScriptElement = document.createElement('script');
