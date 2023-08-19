@@ -2,35 +2,62 @@ window.HTMLComponentRender = container => {
     container.querySelectorAll('html-component').forEach(async HTMLComponent => {
         if(HTMLComponent.hasAttribute('rendered')) return
 
+        HTMLComponent.attachShadow({mode: "open"});
+
         const res = await fetch(HTMLComponent.getAttribute('src'));
         let text = await res.text();
 
         HTMLComponent.setAttribute('children', HTMLComponent.innerHTML);
 
         const propsRegex = /\{(\w+)\}/g;
-        HTMLComponent.innerHTML = text.replace(propsRegex, (match, att) =>
-        HTMLComponent.getAttribute(att) || ''
-        )
 
-        HTMLComponent.querySelectorAll('script').forEach(async scriptElement => {
-            if (scriptElement.hasAttribute('src')) {
-                const res = await fetch(scriptElement.getAttribute('src'))
-                const data = await res.text()
+        if(HTMLComponent.hasAttribute('shadow-dom')) {
+            HTMLComponent.shadowRoot.innerHTML = text.replace(propsRegex, (match, att) =>
+            HTMLComponent.getAttribute(att) || ''
+            )
 
-                const newScriptElement = document.createElement('script');
-                newScriptElement.innerHTML = data
-                document.getElementsByTagName('head')[0].appendChild(newScriptElement)
-            }else{
-                const newScriptElement = document.createElement('script');
-                newScriptElement.innerHTML = scriptElement.innerHTML
-                document.getElementsByTagName('head')[0].appendChild(newScriptElement)
-            }
-            scriptElement.remove()
-        })
+            HTMLComponent.shadowRoot.querySelectorAll('script').forEach(async scriptElement => {
+                if (scriptElement.hasAttribute('src')) {
+                    const res = await fetch(scriptElement.getAttribute('src'))
+                    const data = await res.text()
 
-        HTMLComponent.setAttribute('rendered', '')
+                    const newScriptElement = document.createElement('script');
+                    newScriptElement.innerHTML = data
+                    document.getElementsByTagName('head')[0].appendChild(newScriptElement)
+                }else{
+                    const newScriptElement = document.createElement('script');
+                    newScriptElement.innerHTML = scriptElement.innerHTML
+                    document.getElementsByTagName('head')[0].appendChild(newScriptElement)
+                }
+                scriptElement.remove()
+            })
 
-        HTMLComponentRender(HTMLComponent)
+            HTMLComponent.setAttribute('rendered', '')
+        }else{
+            HTMLComponent.innerHTML = text.replace(propsRegex, (match, att) =>
+            HTMLComponent.getAttribute(att) || ''
+            )
+
+            HTMLComponent.querySelectorAll('script').forEach(async scriptElement => {
+                if (scriptElement.hasAttribute('src')) {
+                    const res = await fetch(scriptElement.getAttribute('src'))
+                    const data = await res.text()
+
+                    const newScriptElement = document.createElement('script');
+                    newScriptElement.innerHTML = data
+                    document.getElementsByTagName('head')[0].appendChild(newScriptElement)
+                }else{
+                    const newScriptElement = document.createElement('script');
+                    newScriptElement.innerHTML = scriptElement.innerHTML
+                    document.getElementsByTagName('head')[0].appendChild(newScriptElement)
+                }
+                scriptElement.remove()
+            })
+
+            HTMLComponent.setAttribute('rendered', '')
+
+            HTMLComponentRender(HTMLComponent)
+        }
     })
 
     container.querySelectorAll('[listener]').forEach(async listenerElement =>
