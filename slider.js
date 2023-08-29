@@ -10,6 +10,7 @@ document.head.innerHTML += `
             position: absolute;
             left: 0;
             top: 0;
+            width: 100%;
         }
     </style>
 `
@@ -28,7 +29,7 @@ sliderElements.forEach(element => {
 
     element.sliderItems = element.querySelectorAll('[slider-item]')
     element.sliderItems.forEach((sliderItem, index) => {
-        sliderItem.style.width = getComputedStyle(element).width
+        // sliderItem.style.width = getComputedStyle(element).width
         if(element.index != index){
             switch(element.animation){
                 case 'slide':
@@ -219,10 +220,15 @@ sliderElements.forEach(element => {
 
         }, element.autoplayDelay)
     }
-    if(element.hasAttribute('autoplay')) element.autoplay()
+    if(element.hasAttribute('slider-autoplay')) element.autoplay()
 
     //click
-    if(element.hasAttribute('click')) element.addEventListener('click', () => {
-        element.next()
-    })
+    if(element.hasAttribute('slider-click')) {
+        element.style.cursor = 'pointer';
+        element.addEventListener('click', () => {
+            element.next()
+            clearTimeout(element.autoplayTimeout)
+            if(element.hasAttribute('slider-autoplay')) element.autoplay()
+        })
+}
 })
