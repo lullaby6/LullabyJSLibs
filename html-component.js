@@ -18,7 +18,7 @@ window.HTMLComponentRender = container => {
             )
 
             HTMLComponent.shadowRoot.querySelectorAll('script').forEach(async scriptElement => {
-                if (scriptElement.hasAttribute('src')) {
+                if(scriptElement.hasAttribute('src')) {
                     const scriptRes = await fetch(scriptElement.getAttribute('src'))
                     const scriptText = await scriptRes.text()
 
@@ -40,7 +40,7 @@ window.HTMLComponentRender = container => {
             )
 
             HTMLComponent.querySelectorAll('script').forEach(async scriptElement => {
-                if (scriptElement.hasAttribute('src')) {
+                if(scriptElement.hasAttribute('src')) {
                     const res = await fetch(scriptElement.getAttribute('src'))
                     const data = await res.text()
 
@@ -64,14 +64,11 @@ window.HTMLComponentRender = container => {
     container.querySelectorAll('[listener]').forEach(async listenerElement =>
         listenerElement.getAttribute('listener').split(' ').forEach(listener => {
             const [eventName, methodName] = listener.split('-')
-            if(eventName == 'load') {
-                listenerMethods[methodName](listenerElement.dispatchEvent(new Event('load')))
-            }else{
-                listenerElement.addEventListener(eventName, event => listenerMethods[methodName](event))
-            }
+			listenerElement.addEventListener(eventName, event => HTMLComponentProps[methodName](event))
+            if(eventName == 'load') HTMLComponentProps[methodName](listenerElement.dispatchEvent(new Event('load')))
         })
     )
 }
 
-window.listenerMethods = {}
+window.HTMLComponentProps = {}
 window.HTMLComponentRender(document)
