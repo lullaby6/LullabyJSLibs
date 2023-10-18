@@ -1,5 +1,5 @@
 window.HTMLComponentRender = container => {
-    container.querySelectorAll('html-component').forEach(async HTMLComponent => {
+    container.querySelectorAll('html-c').forEach(async HTMLComponent => {
         if(HTMLComponent.hasAttribute('rendered')) return
 
         const srcRes = await fetch(HTMLComponent.getAttribute('src'));
